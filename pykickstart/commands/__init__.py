@@ -15,7 +15,7 @@
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  Any Red Hat
 # trademarks that are incorporated in the source code or documentation are not
 # subject to the GNU General Public License and may only be used or replicated
-# with the express permission of Red Hat, Inc. 
+# with the express permission of Red Hat, Inc.
 #
 from pykickstart.commands import \
      authconfig, autopart, autostep, bootloader, btrfs, clearpart, cdrom, device, \
@@ -23,5 +23,5 @@ from pykickstart.commands import \
      group, harddrive, ignoredisk, interactive, iscsi, iscsiname, key, keyboard, lang, \
      langsupport, lilocheck, liveimg, logging, logvol, mediacheck, method, monitor, \
      mouse, multipath, network, nfs, ostreesetup, partition, raid, reqpart, realm, reboot, \
-     repo, rescue, rootpw, selinux, services, skipx, sshpw, sshkey, timezone, updates, \
-     upgrade, url, user, unsupported_hardware, vnc, volgroup, xconfig, zerombr, zfcp
+     repo, rescue, rootpw, selinux, services, skipx, snapshot, sshpw, sshkey, timezone, \
+     updates, upgrade, url, user, unsupported_hardware, vnc, volgroup, xconfig, zerombr, zfcp
