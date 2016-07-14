@@ -34,6 +34,7 @@ class F26_SnapshotData(BaseData):
         BaseData.__init__(self, *args, **kwargs)
         self.name = kwargs.get("name", "")
         self.origin = kwargs.get("origin", "")
+        self.when = kwargs.get("when", "")
 
     def __eq__(self, y):
         if not y:
@@ -44,15 +45,26 @@ class F26_SnapshotData(BaseData):
     def __ne__(self, y):
         return not self == y
 
+    def _getArgsAsStr(self):
+        retval = ""
+
+        if self.when != "":
+            retval += "--when=%s" % (self.when)
+
+        return retval
+
     def __str__(self):
         retval = BaseData.__str__(self)
-        retval += "snapshot %s --name=%s" % (self.origin, self.snapshot_name)
-        return retval + "\n"
+        retval += ("snapshot %s --name=%s %s" % (self.origin,
+                                                 self.name,
+                                                 self._getArgsAsStr()))
+        return retval.strip() + "\n"
 
 
 class F26_Snapshot(KickstartCommand):
     removedKeywords = KickstartCommand.removedKeywords
     removedAttrs = KickstartCommand.removedAttrs
+    when_param_valid_values = ['pre-install', 'post-install']
 
     def __init__(self, writePriority=140, *args, **kwargs):
         KickstartCommand.__init__(self, writePriority, *args, **kwargs)
@@ -71,6 +83,7 @@ class F26_Snapshot(KickstartCommand):
     def _getParser(self):
         op = KSOptionParser()
         op.add_option("--name", dest="name", required=1)
+        op.add_option("--when", dest="when")
 
         return op
 
@@ -78,9 +91,13 @@ class F26_Snapshot(KickstartCommand):
         (opts, extra) = self.op.parse_args(args=args, lineno=self.lineno)
 
         if len(extra) == 0:
-            raise KickstartValueError(formatErrorMsg(self.lineno, msg=_("Snapshot origin must be specified!")))
+            raise KickstartValueError(
+                        formatErrorMsg(self.lineno,
+                                       msg=_("Snapshot origin must be specified!")))
         elif len(extra) > 1:
-            raise KickstartValueError(formatErrorMsg(self.lineno, msg=_("Snapshot origin can be specified only once")))
+            raise KickstartValueError(
+                        formatErrorMsg(self.lineno,
+                                       msg=_("Snapshot origin can be specified only once")))
 
         snap_data = self.handler.SnapshotData()
         self._setToObj(self.op, opts, snap_data)
@@ -100,6 +117,13 @@ class F26_Snapshot(KickstartCommand):
                         formatErrorMsg(self.lineno,
                                        msg=(_("Snapshot origin %s must be specified by VG/LV") %
                                             snap_data.origin)))
+
+        # Check if value in a '--when' param is valid
+        if snap_data.when != "" and snap_data.when not in self.when_param_valid_values:
+            raise KickstartValueError(
+                        formatErrorMsg(self.lineno,
+                                       msg=(_("Snapshot when param can have these values %s") %
+                                            self.when_param_valid_values)))
         return snap_data
 
     def dataList(self):
